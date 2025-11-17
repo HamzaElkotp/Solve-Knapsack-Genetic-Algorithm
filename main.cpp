@@ -7,8 +7,7 @@ class Generation;
 class Population;
 bool validate(Chromosome solution);
 
-int problem_size = 0;
-int n = problem_size;
+int n = 0;
 int weight_limit = 0;
 
 struct item {
@@ -16,7 +15,7 @@ struct item {
     int weight;
     int value;
 };
-vector<item> items(problem_size);
+vector<item> items;
 
 
 
@@ -27,7 +26,12 @@ public:
 
     static function<int(const Chromosome&)> fitness_function;
 
-    Chromosome() : chromosome_string(problem_size) {}
+    static int chromosome_size;
+
+    Chromosome() : chromosome_string(chromosome_size) {
+        if(!chromosome_size)
+            throw runtime_error("Chromosome size must be provided!");
+    }
 
     void calc_chromosome_fitness(){
         if(!fitness_function)
@@ -93,7 +97,6 @@ bool validate(Chromosome &solution, Generation &gen){
         if(solution == chromosome)
             return false;
     }
-    // check redundunt;
     return true;
 }
 
@@ -102,9 +105,12 @@ bool validate(Chromosome &solution, Generation &gen){
 
 
 int main() {
-    problem_size = 10;
+    int problem_size = 10;
+    items.resize(problem_size);
+    n = problem_size;
 
     Chromosome::fitness_function = fitness;
+    Chromosome::chromosome_size = problem_size;
 
     return 0;
 }
