@@ -79,10 +79,17 @@ public:
         chromosomes.push_back(solution);
     }
 
+    // Crossover function override
+    // Mutation function override
+    // validation function override
+
+
+
     Generation() : chromosomes(0) {}
 };
 
 function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in cpp
+int Chromosome::chromosome_size = 0; // in cpp
 
 class Population{
 public:
@@ -90,6 +97,24 @@ public:
 
     void add_generation(Generation &solutions){
         generations.push_back(solutions);
+    }
+
+    void new_generation(){
+        Generation new_generation;
+        // Get best x percent
+        // push best x percent
+
+        // get worst y percent
+        // mutate worst y percent
+        // validate
+        // push mutated worst y percent
+
+        // do crossover
+        // vaidate
+        // push crossover
+
+        new_generation.calc_average();
+        generations.push_back(new_generation);
     }
 
     Population() : generations(0) {}
@@ -129,6 +154,8 @@ int main() {
 
     Chromosome::fitness_function = fitness;
     Chromosome::chromosome_size = problem_size;
+
+    Chromosome *x;
 
     return 0;
 }
