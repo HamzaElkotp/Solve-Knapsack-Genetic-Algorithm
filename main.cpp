@@ -5,7 +5,6 @@ using namespace std;
 class Chromosome;
 class Generation;
 class Population;
-int fitness_function(Chromosome solution);
 bool validate(Chromosome solution);
 
 int problem_size = 0;
@@ -26,15 +25,19 @@ public:
     vector<bool> chromosome_string;
     int fitness = 0;
 
+    static function<int(const Chromosome&)> fitness_function;
+
+    Chromosome() : chromosome_string(problem_size) {}
+
     void calc_chromosome_fitness(){
+        if(!fitness_function)
+            throw runtime_error("Fitness function must be provided!");
         fitness = fitness_function(*this);
     }
 
     bool operator==(const Chromosome& other) const {
         return this->chromosome_string == other.chromosome_string;
     }
-
-    Chromosome() : chromosome_string(problem_size) {}
 };
 
 class Generation{
@@ -57,6 +60,8 @@ public:
     Generation() : chromosomes(0) {}
 };
 
+function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in cpp
+
 class Population{
 public:
     vector<Generation> generations;
@@ -69,7 +74,7 @@ public:
 };
 
 
-int fitness_function(Chromosome &solution){
+int fitness(const Chromosome &solution){
     int weight = 0;
     int value = 0;
     for(int i=0; i<n; i++){
@@ -98,6 +103,8 @@ bool validate(Chromosome &solution, Generation &gen){
 
 int main() {
     problem_size = 10;
+
+    Chromosome::fitness_function = fitness;
 
     return 0;
 }
