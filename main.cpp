@@ -20,9 +20,14 @@ vector<item> items;
 
 
 class Chromosome{
-public:
-    vector<bool> chromosome_string;
+private:
     int fitness = 0;
+    bool fitness_calculated = false;
+
+protected:
+    vector<bool> chromosome_string;
+
+public:
 
     static function<int(const Chromosome&)> fitness_function;
 
@@ -33,10 +38,22 @@ public:
             throw runtime_error("Chromosome size must be provided!");
     }
 
-    void calc_chromosome_fitness(){
+    int calc_chromosome_fitness(){
         if(!fitness_function)
             throw runtime_error("Fitness function must be provided!");
         fitness = fitness_function(*this);
+        fitness_calculated = true;
+        return fitness;
+    }
+
+    int get_chromosome_fitness(){
+        if(!fitness_calculated)
+            calc_chromosome_fitness();
+        return fitness;
+    }
+
+    [[nodiscard]] vector<bool> get_chromosome_string() const {
+        return chromosome_string;
     }
 
     bool operator==(const Chromosome& other) const {
@@ -49,12 +66,13 @@ public:
     vector<Chromosome> chromosomes;
     long long average_fitness = 0;
 
-    void calc_average(){
+    long long calc_average(){
         long long total = 0;
         for(auto & chromosome : chromosomes){
-            total+= chromosome.fitness;
+            total+= chromosome.get_chromosome_fitness();
         }
         average_fitness = round(total/(long long)chromosomes.size());
+        return average_fitness;
     }
 
     void add_chromosome(Chromosome &solution){
@@ -82,7 +100,7 @@ int fitness(const Chromosome &solution){
     int weight = 0;
     int value = 0;
     for(int i=0; i<n; i++){
-        if(solution.chromosome_string[i]){
+        if(solution.get_chromosome_string()[i]){
             weight += items[i].weight;
             value += items[i].value;
         }
@@ -91,7 +109,7 @@ int fitness(const Chromosome &solution){
 }
 
 bool validate(Chromosome &solution, Generation &gen){
-    if(solution.fitness==0)
+    if(solution.get_chromosome_fitness()==0)
         return false;
     for(auto & chromosome : gen.chromosomes){
         if(solution == chromosome)
