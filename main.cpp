@@ -62,11 +62,38 @@ public:
 };
 
 class Generation{
+    bool is_generation_sorted = false;
 public:
     vector<Chromosome> chromosomes;
     long long average_fitness = 0;
+    long long worst_fitness = 0;
+    long long best_fitness = 0;
+    Chromosome best_chromosome;
+    Chromosome worst_chromosome;
 
-    long long calc_average(){
+    void sort_generation() {
+        sort(chromosomes.begin(), chromosomes.end(),
+             [](Chromosome& a, Chromosome& b){
+                      return a.get_chromosome_fitness() > b.get_chromosome_fitness(); // descending
+                  });
+        is_generation_sorted = true;
+    }
+
+    void set_best_chromosome(){
+        if(!is_generation_sorted)
+            sort_generation();
+        best_chromosome = chromosomes.front();
+        best_fitness = best_chromosome.get_chromosome_fitness();
+    }
+
+    void set_worst_chromosome(){
+        if(!is_generation_sorted)
+            sort_generation();
+        worst_chromosome = chromosomes.back();
+        worst_fitness = worst_chromosome.get_chromosome_fitness();
+    }
+
+    long long set_average(){
         long long total = 0;
         for(auto & chromosome : chromosomes){
             total+= chromosome.get_chromosome_fitness();
@@ -82,8 +109,6 @@ public:
     // Crossover function override
     // Mutation function override
     // validation function override
-
-
 
     Generation() : chromosomes(0) {}
 };
@@ -113,7 +138,7 @@ public:
         // vaidate
         // push crossover
 
-        new_generation.calc_average();
+        new_generation.set_average();
         generations.push_back(new_generation);
     }
 
