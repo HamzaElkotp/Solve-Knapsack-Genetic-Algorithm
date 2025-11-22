@@ -63,11 +63,15 @@ public:
 
 class Generation{
     bool is_generation_sorted = false;
+    bool is_worst_stored = false;
+    bool is_average_stored = false;
+    bool is_worst_best = false;
 public:
     vector<Chromosome> chromosomes;
     long long average_fitness = 0;
     long long worst_fitness = 0;
     long long best_fitness = 0;
+    long long generation_size = 0;
     Chromosome best_chromosome;
     Chromosome worst_chromosome;
 
@@ -93,12 +97,19 @@ public:
         worst_fitness = worst_chromosome.get_chromosome_fitness();
     }
 
+    void set_generation_size(){
+        generation_size = (long long)chromosomes.size();
+    }
+
     long long set_average(){
+        if(generation_size==0)
+            set_generation_size();
+
         long long total = 0;
         for(auto & chromosome : chromosomes){
             total+= chromosome.get_chromosome_fitness();
         }
-        average_fitness = round(total/(long long)chromosomes.size());
+        average_fitness = round(total/generation_size);
         return average_fitness;
     }
 
@@ -109,6 +120,14 @@ public:
     // Crossover function override
     // Mutation function override
     // validation function override
+
+
+    void destroy_generation_memory() {
+        if(!is_average_stored) set_average();
+        if(!is_worst_stored) set_worst_chromosome();
+        if(!is_worst_best) set_best_chromosome();
+        vector<Chromosome>().swap(chromosomes);
+    }
 
     Generation() : chromosomes(0) {}
 };
@@ -138,7 +157,14 @@ public:
         // vaidate
         // push crossover
 
+        new_generation.set_generation_size();
         new_generation.set_average();
+        new_generation.sort_generation();
+        new_generation.set_worst_chromosome();
+        new_generation.set_best_chromosome();
+
+        generations.back().destroy_generation_memory(); // clear previous generation
+
         generations.push_back(new_generation);
     }
 
