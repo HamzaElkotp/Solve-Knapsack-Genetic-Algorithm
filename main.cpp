@@ -136,32 +136,32 @@ public:
         return Chromosome(chromosome_size);
     }
 
-    vector<Chromosome> do_elitism(Generation &old_generation, Generation &new_generation){
+    virtual vector<Chromosome> do_elitism(Generation &old_generation, Generation &new_generation){ // User should override
         throw runtime_error("Elitism function must be overridden!");
         return vector<Chromosome>(0);
     }
 
-    vector<Chromosome> do_mutation(Generation &old_generation, Generation &new_generation){
+    virtual vector<Chromosome> do_mutation(Generation &old_generation, Generation &new_generation){ // User should override
         throw runtime_error("Mutation function must be overridden!");
         return vector<Chromosome>(0);
     }
 
-    vector<pair<Chromosome, Chromosome>> do_selection(Generation &old_generation){
+    virtual vector<pair<Chromosome, Chromosome>> do_selection(Generation &old_generation){ // User should override
         throw runtime_error("selection function must be overridden!");
         return vector<pair<Chromosome, Chromosome>>(0);
     }
 
-    vector<Chromosome> do_crossover(vector<pair<Chromosome, Chromosome>> &pairs){
+    virtual vector<Chromosome> do_crossover(vector<pair<Chromosome, Chromosome>> &pairs){ // User should override
         throw runtime_error("Crossover function must be overridden!");
         return vector<Chromosome>(0);
     }
 
-    bool do_validation(const Chromosome &solution, const Generation &gen){
+    virtual bool do_validation(const Chromosome &solution, const Generation &gen){ // User should override
         throw runtime_error("Validation function must be overridden!");
         return false;
     }
 
-    int calc_fitness(const Chromosome &solution){
+    virtual int calc_fitness(const Chromosome &solution){ // User should override
         throw runtime_error("Fitness function must be overridden!");
         return 0;
     }
