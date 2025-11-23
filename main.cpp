@@ -242,7 +242,7 @@ public:
         if(generations.size() > 1)
             generations.back().destroy_generation_memory(); // clear previous generation
 
-        add_generation(new_generation); // generations.push_back(new_generation);
+        add_generation(std::move(new_generation)); // generations.push_back(new_generation);
     }
 
     void run(int generations_count) {
