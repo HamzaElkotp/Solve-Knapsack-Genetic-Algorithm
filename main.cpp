@@ -23,19 +23,12 @@ class Chromosome{
 private:
 
 protected:
-    vector<bool> chromosome_string;
 
 public:
     int fitness = 0;
+    vector<bool> chromosome_string;
 
-    static int chromosome_size;
-
-    Chromosome() : chromosome_string(chromosome_size) {
-        if(!chromosome_size)
-            throw runtime_error("Chromosome size must be provided!");
-    }
-
-    vector<bool> get_chromosome_string() const {
+    [[nodiscard]] vector<bool> get_chromosome_string() const {
         return chromosome_string;
     }
 
@@ -111,18 +104,19 @@ public:
 };
 
 //function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in cpp
-int Chromosome::chromosome_size = 0; // in cpp
+//int Chromosome::chromosome_size = 0; // in cpp
 
 class Population{
 private:
 //    int elitism_percent;
 //    int mutation_percent;
+    int chromosome_size;
 
 public:
     vector<Generation> generations;
 
-    void add_generation(Generation &solutions){
-        generations.push_back(solutions);
+    void set_chromosome_size(int num){
+        chromosome_size = num;
     }
 
 //    void set_elitism_percent(int num){
@@ -169,6 +163,10 @@ public:
     int calc_fitness(Chromosome &solution){
         throw runtime_error("Fitness function must be overridden!");
         return 0;
+    }
+
+    void add_generation(Generation &solutions){
+        generations.push_back(solutions);
     }
 
     void new_generation(){
@@ -236,7 +234,7 @@ int main() {
 //    Chromosome::fitness_function = fitness;
 //    Chromosome::chromosome_size = problem_size;
 
-//    Chromosome *x;
+    Chromosome *x;
 
     return 0;
 }
