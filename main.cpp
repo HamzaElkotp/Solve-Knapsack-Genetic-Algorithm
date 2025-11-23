@@ -137,9 +137,8 @@ int Chromosome::chromosome_size = 0; // in cpp
 
 class Population{
 private:
-    int elitism_percent;
-    int mutation_percent;
-
+//    int elitism_percent;
+//    int mutation_percent;
 
 public:
     vector<Generation> generations;
@@ -148,31 +147,37 @@ public:
         generations.push_back(solutions);
     }
 
-    void set_elitism_percent(int num){
-        if(num > 100 || num<0)
-            throw runtime_error("Elitism percent must be between 0 - 100!");
-        elitism_percent = num;
-    }
-
-    void set_mutation_percent(int num){
-        if(num > 100 || num<0)
-            throw runtime_error("Mutation percent must be between 0 - 100!");
-        mutation_percent = num;
-    }
+//    void set_elitism_percent(int num){
+//        if(num > 100 || num<0)
+//            throw runtime_error("Elitism percent must be between 0 - 100!");
+//        elitism_percent = num;
+//    }
+//
+//    void set_mutation_percent(int num){
+//        if(num > 100 || num<0)
+//            throw runtime_error("Mutation percent must be between 0 - 100!");
+//        mutation_percent = num;
+//    }
 
 //    void initiate_population(){
 //
 //    }
 
+    vector<Chromosome> do_elitism(Generation &old_generation, Generation &new_generation){
+        throw runtime_error("Elitism function must be overridden!");
+        return vector<Chromosome>(0);
+    }
+
+    vector<Chromosome> do_mutation(Generation &old_generation, Generation &new_generation){
+        throw runtime_error("Mutation function must be overridden!");
+        return vector<Chromosome>(0);
+    }
+
     void new_generation(){
         Generation new_generation;
-        // Get best x percent
-        // push best x percent
+        do_elitism(generations.back(), new_generation);
 
-        // get worst y percent
-        // mutate worst y percent
-        // validate
-        // push mutated worst y percent
+        do_mutation(generations.back(), new_generation);
 
         // do crossover
         // vaidate
