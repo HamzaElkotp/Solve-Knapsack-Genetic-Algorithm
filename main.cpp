@@ -108,13 +108,9 @@ public:
     }
 };
 
-//function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in cpp
-//int Chromosome::chromosome_size = 0; // in cpp
 
 class Population{
 private:
-//    int elitism_percent;
-//    int mutation_percent;
     int chromosome_size;
 
 public:
@@ -128,18 +124,6 @@ public:
         if (chromosome_size <= 0) throw runtime_error("chromosome_size not set");
         return Chromosome(chromosome_size);
     }
-
-//    void set_elitism_percent(int num){
-//        if(num > 100 || num<0)
-//            throw runtime_error("Elitism percent must be between 0 - 100!");
-//        elitism_percent = num;
-//    }
-//
-//    void set_mutation_percent(int num){
-//        if(num > 100 || num<0)
-//            throw runtime_error("Mutation percent must be between 0 - 100!");
-//        mutation_percent = num;
-//    }
 
     vector<Chromosome> do_elitism(Generation &old_generation, Generation &new_generation){
         throw runtime_error("Elitism function must be overridden!");
@@ -176,7 +160,7 @@ public:
     }
 
     void initiate_first_population(int population_size, int max_attempts, function<void(Chromosome&)> user_logic){
-        Generation gen;
+        Generation first_generation;
         int attempts = 0;
         int created = 0;
 
@@ -187,18 +171,25 @@ public:
             user_logic(c);
 
             // Validate
-            if (!do_validation(c, gen)) {
+            if (!do_validation(c, first_generation)) {
                 attempts++;
                 continue;      // Try again
             }
 
             calc_fitness(c);
-            gen.add_chromosome(c);
+            first_generation.add_chromosome(c);
             created++;
         }
 
+
+        first_generation.set_generation_size();
+        first_generation.set_average();
+        first_generation.sort_generation();
+        first_generation.set_worst_chromosome();
+        first_generation.set_best_chromosome();
+
         // Store first generation
-        add_generation(gen);
+        add_generation(first_generation);
     }
 
     void new_generation(){
