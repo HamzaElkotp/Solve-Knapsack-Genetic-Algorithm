@@ -41,10 +41,11 @@ public:
 };
 
 class Generation{
+private:
     bool is_generation_sorted = false;
-    bool is_worst_stored = false;
-    bool is_average_stored = false;
-    bool is_worst_best = false;
+    bool is_worst_setted = false;
+    bool is_average_setted = false;
+    bool is_best_setted = false;
 public:
     vector<Chromosome> chromosomes;
     long long average_fitness = 0;
@@ -67,6 +68,7 @@ public:
             sort_generation();
         best_chromosome = chromosomes.front();
         best_fitness = best_chromosome.fitness;
+        is_best_setted = true;
     }
 
     void set_worst_chromosome(){
@@ -74,6 +76,7 @@ public:
             sort_generation();
         worst_chromosome = chromosomes.back();
         worst_fitness = worst_chromosome.fitness;
+        is_worst_setted = true;
     }
 
     void set_generation_size(){
@@ -89,6 +92,7 @@ public:
             total+= chromosome.fitness;
         }
         average_fitness = round(total/generation_size);
+        is_average_setted = true;
         return average_fitness;
     }
 
@@ -97,9 +101,9 @@ public:
     }
 
     void destroy_generation_memory() {
-        if(!is_average_stored) set_average();
-        if(!is_worst_stored) set_worst_chromosome();
-        if(!is_worst_best) set_best_chromosome();
+        if(!is_average_setted) set_average();
+        if(!is_worst_setted) set_worst_chromosome();
+        if(!is_best_setted) set_best_chromosome();
         vector<Chromosome>().swap(chromosomes);
     }
 };
@@ -136,10 +140,6 @@ public:
 //        mutation_percent = num;
 //    }
 
-//    void initiate_population(){
-//
-//    }
-
     vector<Chromosome> do_elitism(Generation &old_generation, Generation &new_generation){
         throw runtime_error("Elitism function must be overridden!");
         return vector<Chromosome>(0);
@@ -172,6 +172,10 @@ public:
 
     void add_generation(Generation &solutions){
         generations.push_back(solutions);
+    }
+
+    void initiate_first_population(){
+
     }
 
     void new_generation(){
