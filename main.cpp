@@ -91,12 +91,12 @@ public:
         for(auto & chromosome : chromosomes){
             total+= chromosome.fitness;
         }
-        average_fitness = round(total/generation_size);
+        average_fitness = llround((double)total / (double )generation_size);
         is_average_setted = true;
         return average_fitness;
     }
 
-    void add_chromosome(Chromosome &solution){
+    void add_chromosome(const Chromosome &solution){
         chromosomes.push_back(solution);
     }
 
@@ -181,13 +181,15 @@ public:
     void new_generation(){
         Generation new_generation;
 
-        do_elitism(generations.back(), new_generation);
+        vector<Chromosome> elites = do_elitism(generations.back(), new_generation);
+        for(auto &c : elites) new_generation.add_chromosome(c);
 
-        do_mutation(generations.back(), new_generation);
+        vector<Chromosome> mutates = do_mutation(generations.back(), new_generation);
+        for(auto &c : mutates) new_generation.add_chromosome(c);
 
         vector<pair<Chromosome, Chromosome>> pairs = do_selection(generations.back());
         vector<Chromosome> children = do_crossover(pairs);
-        for(auto ch:children){
+        for(auto &ch:children){
             if(do_validation(ch, new_generation)) {
                 ch.fitness = calc_fitness(ch);
                 new_generation.add_chromosome(ch);
@@ -200,7 +202,8 @@ public:
         new_generation.set_worst_chromosome();
         new_generation.set_best_chromosome();
 
-        generations.back().destroy_generation_memory(); // clear previous generation
+        if(generations.size() > 1)
+            generations.back().destroy_generation_memory(); // clear previous generation
 
         add_generation(new_generation); // generations.push_back(new_generation);
     }
