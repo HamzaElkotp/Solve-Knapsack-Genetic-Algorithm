@@ -183,6 +183,11 @@ public:
         return vector<Chromosome>(0);
     }
 
+    bool do_validation(Chromosome &solution, Generation &gen){
+        throw runtime_error("Validation function must be overridden!");
+        return false;
+    }
+
     void new_generation(){
         Generation new_generation;
         do_elitism(generations.back(), new_generation);
@@ -191,8 +196,10 @@ public:
 
         vector<pair<Chromosome, Chromosome>> pairs = do_selection(generations.back());
         vector<Chromosome> children = do_crossover(pairs);
-        // vaidate
-        // push crossover
+        for(auto ch:children){
+            if(do_validation(ch, new_generation))
+                new_generation.add_chromosome(ch);
+        }
 
         new_generation.set_generation_size();
         new_generation.set_average();
