@@ -112,6 +112,7 @@ public:
 class Population{
 private:
     int chromosome_size;
+    int generations_number = 0;
 
 public:
     vector<Generation> generations;
@@ -161,6 +162,7 @@ public:
 
     void initiate_first_population(int population_size, int max_attempts, function<void(Chromosome&)> user_logic){
         Generation first_generation;
+        first_generation.chromosomes.reserve(population_size);
         int attempts = 0;
         int created = 0;
 
@@ -176,11 +178,15 @@ public:
                 continue;      // Try again
             }
 
-            calc_fitness(c);
+            c.fitness = calc_fitness(c);
             first_generation.add_chromosome(c);
             created++;
         }
 
+        if (created == 0)
+            throw runtime_error("Could not create any chromosome. Validation too strict or user_logic incorrect.");
+
+        generations_number++;
 
         first_generation.set_generation_size();
         first_generation.set_average();
@@ -193,6 +199,9 @@ public:
     }
 
     void new_generation(){
+        if (generations_number == 0)
+            throw runtime_error("Initial Population should be generated first using initiate_first_population function");
+
         Generation new_generation;
 
         vector<Chromosome> elites = do_elitism(generations.back(), new_generation);
