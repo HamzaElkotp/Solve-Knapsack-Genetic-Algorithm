@@ -136,12 +136,33 @@ function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in c
 int Chromosome::chromosome_size = 0; // in cpp
 
 class Population{
+private:
+    int elitism_percent;
+    int mutation_percent;
+
+
 public:
     vector<Generation> generations;
 
     void add_generation(Generation &solutions){
         generations.push_back(solutions);
     }
+
+    void set_elitism_percent(int num){
+        if(num > 100 || num<0)
+            throw runtime_error("Elitism percent must be between 0 - 100!");
+        elitism_percent = num;
+    }
+
+    void set_mutation_percent(int num){
+        if(num > 100 || num<0)
+            throw runtime_error("Mutation percent must be between 0 - 100!");
+        mutation_percent = num;
+    }
+
+//    void initiate_population(){
+//
+//    }
 
     void new_generation(){
         Generation new_generation;
@@ -172,27 +193,27 @@ public:
 };
 
 
-int fitness(const Chromosome &solution){
-    int weight = 0;
-    int value = 0;
-    for(int i=0; i<n; i++){
-        if(solution.get_chromosome_string()[i]){
-            weight += items[i].weight;
-            value += items[i].value;
-        }
-    }
-    return weight;
-}
+//int fitness(const Chromosome &solution){
+//    int weight = 0;
+//    int value = 0;
+//    for(int i=0; i<n; i++){
+//        if(solution.get_chromosome_string()[i]){
+//            weight += items[i].weight;
+//            value += items[i].value;
+//        }
+//    }
+//    return weight;
+//}
 
-bool validate(Chromosome &solution, Generation &gen){
-    if(solution.get_chromosome_fitness()==0)
-        return false;
-    for(auto & chromosome : gen.chromosomes){
-        if(solution == chromosome)
-            return false;
-    }
-    return true;
-}
+//bool validate(Chromosome &solution, Generation &gen){
+//    if(solution.get_chromosome_fitness()==0)
+//        return false;
+//    for(auto & chromosome : gen.chromosomes){
+//        if(solution == chromosome)
+//            return false;
+//    }
+//    return true;
+//}
 
 
 
@@ -203,10 +224,10 @@ int main() {
     items.resize(problem_size);
     n = problem_size;
 
-    Chromosome::fitness_function = fitness;
-    Chromosome::chromosome_size = problem_size;
+//    Chromosome::fitness_function = fitness;
+//    Chromosome::chromosome_size = problem_size;
 
-    Chromosome *x;
+//    Chromosome *x;
 
     return 0;
 }
