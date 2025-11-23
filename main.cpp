@@ -28,7 +28,7 @@ public:
     int fitness = 0;
     vector<bool> chromosome_string;
 
-    [[nodiscard]] vector<bool> get_chromosome_string() const {
+    [[nodiscard]] const std::vector<bool>& get_chromosome_string() const noexcept {
         return chromosome_string;
     }
 
@@ -43,9 +43,9 @@ public:
 class Generation{
 private:
     bool is_generation_sorted = false;
-    bool is_worst_setted = false;
-    bool is_average_setted = false;
-    bool is_best_setted = false;
+    bool is_worst_set = false;
+    bool is_average_set = false;
+    bool is_best_set = false;
 public:
     vector<Chromosome> chromosomes;
     long long average_fitness = 0;
@@ -57,7 +57,7 @@ public:
 
     void sort_generation() {
         sort(chromosomes.begin(), chromosomes.end(),
-             [](Chromosome& a, Chromosome& b){
+             [](const Chromosome& a, const Chromosome& b){
                       return a.fitness > b.fitness; // descending
                   });
         is_generation_sorted = true;
@@ -68,7 +68,7 @@ public:
             sort_generation();
         best_chromosome = chromosomes.front();
         best_fitness = best_chromosome.fitness;
-        is_best_setted = true;
+        is_best_set = true;
     }
 
     void set_worst_chromosome(){
@@ -76,7 +76,7 @@ public:
             sort_generation();
         worst_chromosome = chromosomes.back();
         worst_fitness = worst_chromosome.fitness;
-        is_worst_setted = true;
+        is_worst_set = true;
     }
 
     void set_generation_size(){
@@ -92,7 +92,7 @@ public:
             total+= chromosome.fitness;
         }
         average_fitness = llround((double)total / (double )generation_size);
-        is_average_setted = true;
+        is_average_set = true;
         return average_fitness;
     }
 
@@ -101,9 +101,9 @@ public:
     }
 
     void destroy_generation_memory() {
-        if(!is_average_setted) set_average();
-        if(!is_worst_setted) set_worst_chromosome();
-        if(!is_best_setted) set_best_chromosome();
+        if(!is_average_set) set_average();
+        if(!is_worst_set) set_worst_chromosome();
+        if(!is_best_set) set_best_chromosome();
         vector<Chromosome>().swap(chromosomes);
     }
 };
@@ -125,6 +125,7 @@ public:
     }
 
     Chromosome new_chromosome(){
+        if (chromosome_size <= 0) throw runtime_error("chromosome_size not set");
         return Chromosome(chromosome_size);
     }
 
@@ -160,12 +161,12 @@ public:
         return vector<Chromosome>(0);
     }
 
-    bool do_validation(Chromosome &solution, Generation &gen){
+    bool do_validation(const Chromosome &solution, const Generation &gen){
         throw runtime_error("Validation function must be overridden!");
         return false;
     }
 
-    int calc_fitness(Chromosome &solution){
+    int calc_fitness(const Chromosome &solution){
         throw runtime_error("Fitness function must be overridden!");
         return 0;
     }
