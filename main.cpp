@@ -175,8 +175,30 @@ public:
         generations.push_back(solutions);
     }
 
-    void initiate_first_population(){
+    void initiate_first_population(int population_size, int max_attempts, function<void(Chromosome&)> user_logic){
+        Generation gen;
+        int attempts = 0;
+        int created = 0;
 
+        while (created < population_size && attempts < max_attempts){
+            Chromosome c(chromosome_size);
+
+            // Let the user fill/update the chromosome
+            user_logic(c);
+
+            // Validate
+            if (!do_validation(c, gen)) {
+                attempts++;
+                continue;      // Try again
+            }
+
+            calc_fitness(c);
+            gen.add_chromosome(c);
+            created++;
+        }
+
+        // Store first generation
+        add_generation(gen);
     }
 
     void new_generation(){
