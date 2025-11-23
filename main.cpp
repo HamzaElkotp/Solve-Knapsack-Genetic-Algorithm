@@ -35,6 +35,9 @@ public:
     bool operator==(const Chromosome& other) const {
         return this->chromosome_string == other.chromosome_string;
     }
+
+    Chromosome(int sz) : chromosome_string(sz) {}
+    Chromosome() : chromosome_string(0) {}
 };
 
 class Generation{
@@ -99,8 +102,6 @@ public:
         if(!is_worst_best) set_best_chromosome();
         vector<Chromosome>().swap(chromosomes);
     }
-
-    Generation() : chromosomes(0) {}
 };
 
 //function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in cpp
@@ -117,6 +118,10 @@ public:
 
     void set_chromosome_size(int num){
         chromosome_size = num;
+    }
+
+    Chromosome new_chromosome(){
+        return Chromosome(chromosome_size);
     }
 
 //    void set_elitism_percent(int num){
@@ -193,7 +198,7 @@ public:
 
         generations.back().destroy_generation_memory(); // clear previous generation
 
-        generations.push_back(new_generation);
+        add_generation(new_generation); // generations.push_back(new_generation);
     }
 
     Population() : generations(0) {}
