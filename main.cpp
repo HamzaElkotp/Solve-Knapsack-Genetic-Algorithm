@@ -21,15 +21,12 @@ vector<item> items;
 
 class Chromosome{
 private:
-    int fitness = 0;
-    bool fitness_calculated = false;
 
 protected:
     vector<bool> chromosome_string;
 
 public:
-
-    static function<int(const Chromosome&)> fitness_function;
+    int fitness = 0;
 
     static int chromosome_size;
 
@@ -38,21 +35,7 @@ public:
             throw runtime_error("Chromosome size must be provided!");
     }
 
-    int calc_chromosome_fitness(){
-        if(!fitness_function)
-            throw runtime_error("Fitness function must be provided!");
-        fitness = fitness_function(*this);
-        fitness_calculated = true;
-        return fitness;
-    }
-
-    int get_chromosome_fitness(){
-        if(!fitness_calculated)
-            calc_chromosome_fitness();
-        return fitness;
-    }
-
-    [[nodiscard]] vector<bool> get_chromosome_string() const {
+    vector<bool> get_chromosome_string() const {
         return chromosome_string;
     }
 
@@ -78,7 +61,7 @@ public:
     void sort_generation() {
         sort(chromosomes.begin(), chromosomes.end(),
              [](Chromosome& a, Chromosome& b){
-                      return a.get_chromosome_fitness() > b.get_chromosome_fitness(); // descending
+                      return a.fitness > b.fitness; // descending
                   });
         is_generation_sorted = true;
     }
@@ -87,14 +70,14 @@ public:
         if(!is_generation_sorted)
             sort_generation();
         best_chromosome = chromosomes.front();
-        best_fitness = best_chromosome.get_chromosome_fitness();
+        best_fitness = best_chromosome.fitness;
     }
 
     void set_worst_chromosome(){
         if(!is_generation_sorted)
             sort_generation();
         worst_chromosome = chromosomes.back();
-        worst_fitness = worst_chromosome.get_chromosome_fitness();
+        worst_fitness = worst_chromosome.fitness;
     }
 
     void set_generation_size(){
@@ -107,7 +90,7 @@ public:
 
         long long total = 0;
         for(auto & chromosome : chromosomes){
-            total+= chromosome.get_chromosome_fitness();
+            total+= chromosome.fitness;
         }
         average_fitness = round(total/generation_size);
         return average_fitness;
@@ -116,11 +99,6 @@ public:
     void add_chromosome(Chromosome &solution){
         chromosomes.push_back(solution);
     }
-
-    // Crossover function override
-    // Mutation function override
-    // validation function override
-
 
     void destroy_generation_memory() {
         if(!is_average_stored) set_average();
@@ -132,7 +110,7 @@ public:
     Generation() : chromosomes(0) {}
 };
 
-function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in cpp
+//function<int(const Chromosome&)> Chromosome::fitness_function = nullptr; // in cpp
 int Chromosome::chromosome_size = 0; // in cpp
 
 class Population{
@@ -188,8 +166,14 @@ public:
         return false;
     }
 
+    int calc_fitness(Chromosome &solution){
+        throw runtime_error("Fitness function must be overridden!");
+        return 0;
+    }
+
     void new_generation(){
         Generation new_generation;
+
         do_elitism(generations.back(), new_generation);
 
         do_mutation(generations.back(), new_generation);
@@ -197,8 +181,10 @@ public:
         vector<pair<Chromosome, Chromosome>> pairs = do_selection(generations.back());
         vector<Chromosome> children = do_crossover(pairs);
         for(auto ch:children){
-            if(do_validation(ch, new_generation))
+            if(do_validation(ch, new_generation)) {
+                ch.fitness = calc_fitness(ch);
                 new_generation.add_chromosome(ch);
+            }
         }
 
         new_generation.set_generation_size();
