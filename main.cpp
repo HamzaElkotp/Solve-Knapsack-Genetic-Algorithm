@@ -173,13 +173,18 @@ public:
         return vector<Chromosome>(0);
     }
 
+    vector<pair<Chromosome, Chromosome>> do_selection(Generation &old_generation){
+        throw runtime_error("selection function must be overridden!");
+        return vector<pair<Chromosome, Chromosome>>(0);
+    }
+
     void new_generation(){
         Generation new_generation;
         do_elitism(generations.back(), new_generation);
 
         do_mutation(generations.back(), new_generation);
 
-        // do crossover
+        do_selection(generations.back());
         // vaidate
         // push crossover
 
