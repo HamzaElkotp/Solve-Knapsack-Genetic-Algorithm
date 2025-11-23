@@ -166,13 +166,15 @@ public:
         return 0;
     }
 
-    void add_generation(Generation &solutions){
-        generations.push_back(solutions);
+    void add_generation(Generation solutions){
+        generations.push_back(std::move(solutions));
     }
 
     function<void(Chromosome&)> first_population_logic;
 
     void initiate_first_population(){
+        if (!first_population_logic) throw runtime_error("first_population_logic not set");
+
         Generation first_generation;
         first_generation.chromosomes.reserve(start_population_size);
         int attempts = 0;
@@ -207,7 +209,7 @@ public:
         first_generation.set_best_chromosome();
 
         // Store first generation
-        add_generation(first_generation);
+        add_generation(std::move(first_generation));
     }
 
     void new_generation(){
