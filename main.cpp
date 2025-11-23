@@ -178,13 +178,19 @@ public:
         return vector<pair<Chromosome, Chromosome>>(0);
     }
 
+    vector<Chromosome> do_crossover(vector<pair<Chromosome, Chromosome>> &pairs){
+        throw runtime_error("Crossover function must be overridden!");
+        return vector<Chromosome>(0);
+    }
+
     void new_generation(){
         Generation new_generation;
         do_elitism(generations.back(), new_generation);
 
         do_mutation(generations.back(), new_generation);
 
-        do_selection(generations.back());
+        vector<pair<Chromosome, Chromosome>> pairs = do_selection(generations.back());
+        vector<Chromosome> children = do_crossover(pairs);
         // vaidate
         // push crossover
 
