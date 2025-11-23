@@ -111,14 +111,24 @@ public:
 
 class Population{
 private:
-    int chromosome_size;
-    int generations_number = 0;
+    int chromosome_size = 0;
+    int generations_cntr = 0;
+    int start_population_size = 0;
+    int max_attempts = 0;
 
 public:
     vector<Generation> generations;
 
     void set_chromosome_size(int num){
         chromosome_size = num;
+    }
+
+    void set_start_population_size(int num){
+        start_population_size = num;
+    }
+
+    void set_max_attempts(int num){
+        max_attempts = num;
     }
 
     Chromosome new_chromosome(){
@@ -160,22 +170,24 @@ public:
         generations.push_back(solutions);
     }
 
-    void initiate_first_population(int population_size, int max_attempts, function<void(Chromosome&)> user_logic){
+    function<void(Chromosome&)> first_population_logic;
+
+    void initiate_first_population(){
         Generation first_generation;
-        first_generation.chromosomes.reserve(population_size);
+        first_generation.chromosomes.reserve(start_population_size);
         int attempts = 0;
         int created = 0;
 
-        while (created < population_size && attempts < max_attempts){
+        while (created < start_population_size && attempts < max_attempts){
             Chromosome c(chromosome_size);
 
             // Let the user fill/update the chromosome
-            user_logic(c);
+            first_population_logic(c);
 
             // Validate
             if (!do_validation(c, first_generation)) {
                 attempts++;
-                continue;      // Try again
+                continue; // Try again
             }
 
             c.fitness = calc_fitness(c);
@@ -186,7 +198,7 @@ public:
         if (created == 0)
             throw runtime_error("Could not create any chromosome. Validation too strict or user_logic incorrect.");
 
-        generations_number++;
+        generations_cntr++;
 
         first_generation.set_generation_size();
         first_generation.set_average();
@@ -199,7 +211,7 @@ public:
     }
 
     void new_generation(){
-        if (generations_number == 0)
+        if (generations_cntr == 0)
             throw runtime_error("Initial Population should be generated first using initiate_first_population function");
 
         Generation new_generation;
@@ -229,6 +241,21 @@ public:
             generations.back().destroy_generation_memory(); // clear previous generation
 
         add_generation(new_generation); // generations.push_back(new_generation);
+    }
+
+    void run(int generations_count) {
+        if(chromosome_size == 0)
+            throw runtime_error("chromosome_size must be > 0, use set_chromosome_size function");
+        if(start_population_size == 0)
+            throw runtime_error("start_population_size must be > 0, use set_start_population_size function");
+        if(max_attempts == 0)
+            throw runtime_error("max_attempts must be > 0, use set_max_attempts function");
+
+        initiate_first_population();
+
+        for (int i = 0; i < generations_count; i++) {
+            new_generation();
+        }
     }
 
     Population() : generations(0) {}
